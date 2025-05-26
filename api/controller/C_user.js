@@ -39,11 +39,18 @@ const loginuser = async (req, res) => {
 
 const getallusers = async (req, res) => {
     try {
+        if (!req.session.userId) {
+            return res.redirect('/login');
+        }
+
         const logged_user = await user.findById(req.session.userId);
+        if (!logged_user) {
+            return res.status(404).send("User not found");
+        }
 
         let users = await user.find({ _id: { $ne: logged_user._id } });
 
-        if (logged_user.user_order && logged_user.user_order.length > 0) {
+        if (Array.isArray(logged_user.user_order) && logged_user.user_order.length > 0) {
             const orderedUsers = [];
             const remainingUsers = [];
 
@@ -53,15 +60,18 @@ const getallusers = async (req, res) => {
             });
 
             users.forEach(u => {
-                if (!logged_user.user_order.includes(u._id)) {
-                    remainingUsers.push(u); 
+                if (!logged_user.user_order.includes(u._id.toString())) {
+                    remainingUsers.push(u);
                 }
             });
+
             users = [...orderedUsers, ...remainingUsers];
         }
+
         res.render('dashboard', { users, userId: logged_user._id });
+
     } catch (error) {
-        console.log(error);
+        console.error("Dashboard Error:", error);
         res.status(500).send("Internal Server Error");
     }
 };
