@@ -6,6 +6,7 @@ const session=require('express-session');
 require('./DB/config');
 const router = require('./api/routes/R_user');
 require('socket.io');
+const MongoStore = require('connect-mongo');
 
 const http=require('http').createServer(app)
 const io=require('socket.io')(http);
@@ -19,16 +20,22 @@ app.set('view engine','ejs');
 
 app.set('views',path.join(__dirname, 'views'));
 
+
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
-    saveUninitialized: true,
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production', 
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URL,
+        collectionName: 'sessions'
+    }),
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 
+        maxAge: 1000 * 60 * 60 * 24
     }
 }));
+
 
 app.use('/',router)
 

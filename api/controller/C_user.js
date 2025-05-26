@@ -17,10 +17,11 @@ const registeruser = async (req, res) => {
         req.session.userId = newuser._id;
 
         res.redirect('/dashboard');
-    } catch (error) {
-        console.log(error);
-        res.status(500).send("User not created");
-    }
+    }catch (error) {
+    console.error("Register Error:", error.message, error);
+    res.status(500).send("User not created");
+}
+
 };
 
 const login=async(req,res)=>{
