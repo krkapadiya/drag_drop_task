@@ -1,6 +1,7 @@
 require('express');
 require('mongoose');
 const user=require('./../model/M_user');
+const bcrypt=require('bcrypt');
 
 const register=async(req,res)=>{
     res.render('index')
@@ -9,11 +10,13 @@ const register=async(req,res)=>{
 const registeruser = async (req, res) => {
     try {
         const { user_name,email,password } = req.body;
-        const newuser=await user.create({ 
-            user_name:user_name,
-            email:email,
-            password:password
+       const hashedPassword = await bcrypt.hash(password, 10);
+        const newuser = await user.create({
+            user_name,
+            email,
+            password: hashedPassword
         });
+
         req.session.userId = newuser._id;
 
         res.redirect('/dashboard');
@@ -31,9 +34,11 @@ const login=async(req,res)=>{
 const loginuser = async (req, res) => {
     const { email, password } = req.body;
     const finduser = await user.findOne({ email: email });
-    if (!finduser || finduser.password !== password) {
-        return res.status(401).send("Invalid credentials");
-    }
+    const isMatch = await bcrypt.compare(password, finduser.password);
+    if (!finduser || !isMatch) {
+    return res.status(401).send("Invalid credentials");
+}
+
     req.session.userId = finduser._id;  
     res.redirect("/dashboard");
 };
