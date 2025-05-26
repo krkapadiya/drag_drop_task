@@ -14,10 +14,10 @@ const userschema=new mongoose.Schema({
         type:Number,
         default:0
     },
-    user_order:{
+    user_order:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'users'
-    }
+    }]
 },{timestamps:true})
 
 module.exports=mongoose.model('users',userschema);

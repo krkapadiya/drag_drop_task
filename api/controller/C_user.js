@@ -1,5 +1,5 @@
 require('express');
-require('mongoose');
+const mongoose = require('mongoose'); 
 const user=require('./../model/M_user');
 const bcrypt=require('bcrypt');
 
@@ -81,13 +81,18 @@ const getallusers = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+// make sure this is at the top of your file
 
 const updateuserorder = async (req, res) => {
     try {
         const { userIds } = req.body;
         const userId = req.session.userId;
 
-        await user.findByIdAndUpdate(userId, { user_order: userIds });
+        // Convert string IDs to ObjectId
+        const objectIds = userIds.map(id => new mongoose.Types.ObjectId(id));
+
+        // Update with ObjectId array
+        await user.findByIdAndUpdate(userId, { user_order: objectIds });
 
         const io = req.app.get('io');
         io.to(userId.toString()).emit('userorderupdated', userIds);
@@ -104,5 +109,6 @@ const updateuserorder = async (req, res) => {
         });
     }
 };
+
 
 module.exports={register,registeruser,login,loginuser,getallusers,updateuserorder}
