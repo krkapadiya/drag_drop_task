@@ -1,0 +1,37 @@
+# Node.js dependencies
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# dotenv environment files
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Compiled source
+dist/
+build/
+
+# Optional npm cache directory
+.npm
+
+# VSCode settings
+.vscode/
+
+# Ignore service account keys or secrets (if any)
+serviceAccount.json
+
+# Don't ignore this — we want it in Git
+# !src/response/msgcode.js
